@@ -226,7 +226,7 @@
                                 </div>
                             </v-col>
                         </v-row>
-                        {{ timeEnd }}
+                        {{ selectedUser }}
                         <div v-if="usersOptions">
                         <v-select
                                 filled
@@ -239,56 +239,23 @@
                         ></v-select>
                         </div>
                         <v-text-field
-                                v-model="selectedUser[0]"
-                                :rules="inputRules"
-                                filled
-                                color="deep-purple"
-                                label="Email"
-                                style="min-height: 96px"
-                                type="text"
-                        ></v-text-field>
-                        <v-text-field
-                                v-model="selectedUser[2]"
-                                :rules="[rules.length(6)]"
-                                filled
-                                color="deep-purple"
-                                label="Telefon"
-                                style="min-height: 96px"
-                                type="text"
-                        ></v-text-field>
-                        <v-text-field
                                 v-model="selectedUser[3]"
-                                :rules="[rules.length(6)]"
-                                filled
-                                color="deep-purple"
-                                label="Typ"
-                                style="min-height: 96px"
-                                type="text"
-                        ></v-text-field>
-                        <v-text-field
-                                v-model="selectedUser[1]"
-                                :rules="[rules.length(6)]"
+                                :rules="inputRules"
                                 filled
                                 color="deep-purple"
                                 label="Info"
                                 style="min-height: 96px"
                                 type="text"
                         ></v-text-field>
-                        <strong>Event details:</strong>
-                        <ul>
-                            <li>Event starts at: {{ selectedEvent.startDate && selectedEvent.startDate.formatTime() }}</li>
-                            <li>Event ends at: {{ selectedEvent.endDate && selectedEvent.endDate.formatTime() }}</li>
-                            <!-- You can also manipulate the `start` & `end` formatted strings.
-                            <li>Event starts at: {{ (selectedEvent.start || '').substring(11) }}</li>
-                            <li>Event ends at: {{ (selectedEvent.end || '').substring(11) }}</li> -->
-                        </ul>
-                        <v-btn
-                                @click="postEvent"
-                                text
-                        >
-                            <span class="mr-2">Via Email Bestätigen</span>
-                            <v-icon>mdi-calendar-plus</v-icon>
-                        </v-btn>
+                        <v-text-field
+                                v-model="notice"
+                                :rules="[rules.length(6)]"
+                                filled
+                                color="deep-purple"
+                                label="Notiz"
+                                style="min-height: 96px"
+                                type="text"
+                        ></v-text-field>
                         <v-btn
                                 @click="postEvent"
                                 text
@@ -297,6 +264,14 @@
                             <v-icon>mdi-calendar-plus</v-icon>
                         </v-btn>
                     </v-card-text>
+                </v-card>
+            </v-dialog>
+            <!-- Sende Email Dialog -->
+            <v-dialog v-model="showSendEmailDialog">
+                <v-card>
+                    <v-card-title> Schicke deinen Kunden eine Terminbestätigung ...</v-card-title>
+                    <button @click="sendEmail" type="button" style="margin-left: 20px" class="btn-timeEndFilter">Ok</button>
+                    <button @click="closeSendEmail" type="button" style="margin-left: 20px" class="btn-timeEndFilter">Später</button>
                 </v-card>
             </v-dialog>
             <!-- Create User Dialog -->
@@ -475,6 +450,9 @@
       showEventDialog: false,
       showEventInputDialog: false,
       showUserInputDialog: false,
+      showSendEmailDialog: false,
+      notice: undefined,
+      event: undefined,
     //   events: [
     //     {
     //       start: '2020-04-10 10:00',
@@ -550,7 +528,7 @@
         if (!this.getUsers.data) return [];
           return this.getUsers.data.map((item) => {
             return {
-              value: [item.email, item.info, item.phone, item.gender],
+              value: [item.firstName, item.lastName, item.email, item.info, item.gender],
               text: item.lastName + ',' + ' ' + item.firstName
             }
           })
@@ -606,17 +584,29 @@
         this.showUserInputDialog = false;
       },
       postEvent () {
-        let events = {
+        this.event = {
           start: this.dateStart + ' ' + this.timeStart,
           end:this.dateStart + ' ' + this.timeEnd,
-          title: this.title,
-          content: this.content,
-          contentFull: this.contentFull,
-          gender: 'male'
+          title: this.selectedUser[1] + ', ' + this.selectedUser[0],
+          email: this.selectedUser[2],
+          content: this.selectedUser[3],
+          contentFull: this.notice,
+          gender: this.selectedUser[4]
       };
-        console.log('test', events);
-        this.$store.dispatch('postEvents', events);
+        console.log('test', this.event);
+        this.$store.dispatch('postEvents', this.event);
         this.showEventInputDialog = false;
+        this.showSendEmailDialog = true;
+        // window.location.reload();
+      },
+      sendEmail () {
+        console.log(this.event);
+        this.showSendEmailDialog = false;
+        window.location.reload();
+      },
+      closeSendEmail () {
+        console.log(this.event);
+        this.showSendEmailDialog = false;
         window.location.reload();
       },
       deleteEvent (id) {

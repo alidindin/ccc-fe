@@ -12,7 +12,8 @@ export default new Vuex.Store({
     deleteEvent: StoreUtil.state(),
     users: StoreUtil.state(),
     postUsers: StoreUtil.state(),
-    deleteUser: StoreUtil.state()
+    deleteUser: StoreUtil.state(),
+    sendEmail: StoreUtil.state(),
   },
   mutations: {
     [types.SET_CCCAL_GETEVENTS](state, payload) {
@@ -32,6 +33,9 @@ export default new Vuex.Store({
     },
     [types.SET_CCCAL_DELETEUSERS](state, payload) {
       state.deleteUser = StoreUtil.updateState(state.deleteUser, payload);
+    },
+    [types.SET_CCCAL_SENDEMAIL](state, payload) {
+      state.sendEmail = StoreUtil.updateState(state.sendEmail, payload);
     }
   },
   actions: {
@@ -163,6 +167,25 @@ export default new Vuex.Store({
           })
           .catch(e => {
             commit(types.SET_CCCAL_DELETEUSERS, e);
+          })
+    },
+    sendEmail ({ commit }, emailObject) {
+      let url = `http://127.0.0.1:8000/email`;
+      return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(emailObject),
+        headers: {
+          Accept: 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+          .then(() => {
+            console.log('Email send!')
+          })
+          .catch(e => {
+            commit(types.SET_CCCAL_SENDEMAIL, e);
           })
     }
   },
