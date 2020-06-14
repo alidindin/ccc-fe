@@ -169,12 +169,13 @@ export default new Vuex.Store({
             commit(types.SET_CCCAL_DELETEUSERS, e);
           })
     },
-    sendEmail ({ commit }, emailObject) {
+    sendEmail ({ commit }, event) {
+      console.log('emailObject',event);
       let url = `http://127.0.0.1:8000/email`;
       return fetch(url, {
         method: 'POST',
         mode: 'cors',
-        body: JSON.stringify(emailObject),
+        body: JSON.stringify(event),
         headers: {
           Accept: 'application/json',
           'Access-Control-Allow-Origin': '*',
@@ -195,6 +196,7 @@ export default new Vuex.Store({
     deleteEvent: state => state.deleteEvent,
     users: state => state.users,
     postUsers: state => state.postUsers,
-    deleteUser: state => state.deleteUser
+    deleteUser: state => state.deleteUser,
+    sendEmail: state => state.sendEmail
   }
 });

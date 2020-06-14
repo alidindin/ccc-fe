@@ -114,7 +114,12 @@
                 </v-card>
             </v-dialog>
             <!-- Create Event Dialog -->
-            <v-dialog v-model="showEventInputDialog">
+            <v-form
+                    ref="form"
+                    v-model="userInputsValid"
+                    :lazy-validation="lazy"
+            >
+            <v-dialog v-model="showEventInputDialog" :max-width="1200">
                 <v-card>
                     <v-card-title>
                         <h1>Neuer Termin</h1>
@@ -266,16 +271,19 @@
                     </v-card-text>
                 </v-card>
             </v-dialog>
-            <!-- Sende Email Dialog -->
-            <v-dialog v-model="showSendEmailDialog">
-                <v-card>
-                    <v-card-title> Schicke deinen Kunden eine Terminbestätigung ...</v-card-title>
-                    <button @click="sendEmail" type="button" style="margin-left: 20px" class="btn-timeEndFilter">Ok</button>
-                    <button @click="closeSendEmail" type="button" style="margin-left: 20px" class="btn-timeEndFilter">Später</button>
-                </v-card>
-            </v-dialog>
+                <!-- Sende Email Dialog -->
+                <v-dialog v-model="showSendEmailDialog" :max-width="800">
+                    <v-card>
+                        <v-card-title> Schicke deinen Kunden eine Terminbestätigung ...</v-card-title>
+                        <div class="d-flex justify-center" style="padding: 30px">
+                            <button @click="sendEmail" type="button" style="margin-right: 20px" class="btn-ok">Ok</button>
+                            <button @click="closeSendEmail" type="button" style="margin-left: 20px" class="btn-later">Später</button>
+                        </div>
+                    </v-card>
+                </v-dialog>
+            </v-form>
             <!-- Create User Dialog -->
-            <v-dialog v-model="showUserInputDialog">
+            <v-dialog v-model="showUserInputDialog" :max-width="1200">
                 <v-card>
                     <v-card-title>
                         <h1>Neuer Kunde</h1>
@@ -288,7 +296,7 @@
                         <v-form
                             ref="form"
                             v-model="userInputsValid"
-                            lazy-validation
+                            :lazy-validation="lazy"
                         >
                             <v-row>
                                 <v-col cols="6" md="6">
@@ -453,40 +461,7 @@
       showSendEmailDialog: false,
       notice: undefined,
       event: undefined,
-    //   events: [
-    //     {
-    //       start: '2020-04-10 10:00',
-    //       end: '2020-04-10 16:00',
-    //       title: 'this.name',
-    //       content: 'this.user[0].info',
-    //       contentFull: 'My shopping list is rather long:<br><ul><li>Avocados</li><li>Tomatoes</li><li>Potatoes</li><li>Mangoes</li></ul>',
-    //       class: 'male'
-    //     },
-    //     {
-    //       start: '2020-04-11 16:00',
-    //       end: '2020-04-11 17:00',
-    //       title: 'Maria',
-    //       content: 'Click to see my shopping list',
-    //       contentFull: 'My shopping list is rather long:<br><ul><li>Avocados</li><li>Tomatoes</li><li>Potatoes</li><li>Mangoes</li></ul>',
-    //       class: 'female'
-    //     },
-    //     {
-    //       start: '2020-04-12 14:00',
-    //       end: '2020-04-12 16:00',
-    //       title: 'Golf with John',
-    //       content: 'Do I need to tell how many holes?',
-    //       contentFull: 'Okay.<br>It will be a 18 hole golf course.',
-    //       class: 'male'
-    //     },
-    //     {
-    //       start: '2020-04-13 11:00',
-    //       end: '2020-04-13 12:00',
-    //       title: 'Dad\'s birthday!',
-    //       content: 'Do I need to tell how many holes?',
-    //       contentFull: 'Okay.<br>It will be a 18 hole golf course.',
-    //       class: 'female'
-    //     }
-    //   ]
+      lazy: false,
     }),
     computed: {
       ...mapGetters({
@@ -574,12 +549,6 @@
         };
         console.log(user);
         this.$store.dispatch('postUsers', user);
-        this.firstName = '';
-        this.lastName = '';
-        this.email = '';
-        this.phone = '';
-        this.gender = null;
-        this.contentFull = '';
         this.$refs.form.reset();
         this.showUserInputDialog = false;
       },
@@ -597,17 +566,19 @@
         this.$store.dispatch('postEvents', this.event);
         this.showEventInputDialog = false;
         this.showSendEmailDialog = true;
-        // window.location.reload();
       },
       sendEmail () {
         console.log(this.event);
+        this.$store.dispatch('sendEmail', this.event);
+        this.$refs.form.reset();
         this.showSendEmailDialog = false;
-        window.location.reload();
+        setTimeout(function() { window.location.reload(); }, 300);
       },
       closeSendEmail () {
         console.log(this.event);
+        this.$refs.form.reset();
         this.showSendEmailDialog = false;
-        window.location.reload();
+        setTimeout(function() { window.location.reload(); }, 300);
       },
       deleteEvent (id) {
         console.log(id);
@@ -686,5 +657,29 @@
     .btn-timeEndFilter:active {
         background-color: lightgrey;
         border: 2px solid lightgreen;
+    }
+    .btn-ok {
+        height: 40px;
+        width: 100px;
+        border: 2px solid darkseagreen;
+        border-radius: 5px;
+        text-decoration: none;
+        outline: none;
+    }
+    .btn-ok:hover {
+        background-color: lightgreen;
+        border: 2px solid forestgreen;
+    }
+    .btn-later {
+        height: 40px;
+        width: 100px;
+        border: 2px solid lightcoral;
+        border-radius: 5px;
+        text-decoration: none;
+        outline: none;
+    }
+    .btn-later:hover {
+        background-color: lightcoral;
+        border: 2px solid red;
     }
 </style>
