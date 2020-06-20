@@ -456,12 +456,10 @@
       userInputsValid: true,
       selectedUser: [],
       showEventDialog: false,
-      showEventInputDialog: false,
-      showUserInputDialog: false,
       showSendEmailDialog: false,
       notice: undefined,
       event: undefined,
-      lazy: false,
+      lazy: false
     }),
     computed: {
       ...mapGetters({
@@ -515,6 +513,14 @@
       }
     },
     props: {
+      showUserInputDialog: {
+        type: Boolean,
+        default: false,
+      },
+      showEventInputDialog: {
+        type: Boolean,
+        default: false,
+      },
       loading: {
         type: Boolean,
         default: true
